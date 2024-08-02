@@ -1,40 +1,61 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes
+} from "react-router-dom";
+import { useEffect, useState } from "react";
 
-import { IFootballPlayer } from './types'
-import { PlayerTable } from './pages/PlayerTable'
-import { PlayerDetail } from './pages/PlayerDetails'
-import { Layout } from './pages/Layout'
-import { AddPlayer } from './pages/AddPlayer'
-import { getPlayers } from './api/football-api'
+import { Logout } from "./pages/Logout";
+import { Login } from "./pages/Login";
+import { CreateCar } from "./pages/CreateCar";
+import { CarTable } from "./pages/CarTable";
+import { CarDetails } from "./pages/CarDetails";
+import { EditCar } from "./pages/EditCar";
+import { Navbar } from "./components/nav";
 
-export const App = () => {
-  const [players, setPlayers] = useState<IFootballPlayer[]>([])
+export function App() {
+  const [token, setToken] = useState<null | string>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchPlayers = async () => {
-      if (!players.length) {
-        // Acest cod se execută o dată când se încarcă componenta
-        const response = await getPlayers()
+    const savedToken = localStorage.getItem("token");
 
-        setPlayers(response)
-      }
+    if (savedToken) {
+      setToken(savedToken);
+      setIsAuthenticated(true);
     }
+  }, []);
 
-    fetchPlayers()
-  }, [players.length])
+  const handleLogin = (token: string) => {
+    localStorage.setItem("token", token);
+    setToken(token);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
-    <div className="container ">
-      <BrowserRouter>
+    <Router>
+      <div className="App">
+        <Navbar />
         <Routes>
-          <Route element={<Layout />} path="/">
-            <Route element={<PlayerTable players={players} />} index={true} />
-            <Route element={<AddPlayer />} path="newplayer" />
-            <Route element={<PlayerDetail />} path="/:playerId" />
-          </Route>
+          <Route path="/" element={<CarTable token={token} />} />
+          <Route path="/car/:id" element={<CarDetails token={token} />} />
+          <Route path="/create-car" element={<CreateCar token={token} />} />
+          <Route path="/edit-car/:id" element={<EditCar token={token} />} />
+          <Route path="/logout" element={<Logout onLogout={handleLogout} />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </BrowserRouter>
-    </div>
-  )
+      </div>
+    </Router>
+  );
 }

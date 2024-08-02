@@ -1,15 +1,16 @@
-export enum IPosition {
-  Defender = 'Defender',
-  Forward = 'Forward',
-  Goalkeeper = 'Goalkeeper',
-  Midfielder = 'Midfielder'
+export type ICars = {
+  brand: string
+  color: string
+  engine: string
+  horsePower: number
+  id: number
+  model: string
+}
+export type ILogin = {
+  onLogin: (token: string) => void
 }
 
-export type IFootballPlayer = {
-  age: number
-  id: number
-  name: string
-  number: number
-  position: IPosition
-  team: string
+export type ILogout = {
+  onLogout: () => void
+  token: string
 }
