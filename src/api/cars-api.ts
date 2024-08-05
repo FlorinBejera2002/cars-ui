@@ -1,11 +1,6 @@
-export interface Car {
-  brand: string;
-  color: string;
-  engine: string;
-  horsePower: number;
-  id: number;
-  model: string;
-}
+const BASE_URL = "http://localhost:3000";
+
+import { ICars } from "../types";
 
 export interface User {
   id: number;
@@ -27,7 +22,7 @@ export const loginUser = async (
   username: string,
   password: string
 ): Promise<LoginResponse> => {
-  const response = await fetch("http://localhost:3000/login", {
+  const response = await fetch(`${BASE_URL}/login`, {
     body: JSON.stringify({ password, username }),
     headers: {
       "Content-Type": "application/json",
@@ -39,14 +34,13 @@ export const loginUser = async (
     throw new Error("Failed to login");
   }
   const data = await response.json();
-
   return data;
 };
 
 export const logoutUser = async (token: string): Promise<LogoutResponse> => {
-  const response = await fetch("http://localhost:3000/logout", {
+  const response = await fetch(`${BASE_URL}/logout`, {
     headers: {
-      Authorization: `${token}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     method: "POST",
@@ -56,37 +50,15 @@ export const logoutUser = async (token: string): Promise<LogoutResponse> => {
     throw new Error("Failed to logout");
   }
   const data = await response.json();
-
   return data;
 };
 
-export const updateCar = async (
-  id: number,
-  updatedData: Car,
-  token: string
-) => {
-  const response = await fetch(`https://api.example.com/cars/${id}`, {
-    method: "PETCH",
+// For other API calls, ensure the token is included in the headers as shown in the examples below
+
+export const getAllCars = async (token: string): Promise<ICars[]> => {
+  const response = await fetch(`${BASE_URL}/cars`, {
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `${token}`,
-    },
-    body: JSON.stringify(updatedData),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Error updating car:", errorData);
-    throw new Error("Failed to update car");
-  }
-
-  return response.json();
-};
-
-export const getAllCars = async (token: string): Promise<Car[]> => {
-  const response = await fetch("http://localhost:3000/cars", {
-    headers: {
-      Authorization: `${token}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     method: "GET",
@@ -96,63 +68,72 @@ export const getAllCars = async (token: string): Promise<Car[]> => {
     throw new Error("Failed to fetch cars");
   }
   const data = await response.json();
-
   return data;
 };
 
-export const getCarById = async (id: number, token: string): Promise<Car> => {
-  const response = await fetch(`http://localhost:3000/cars/${id}`, {
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-  });
-
-  if (!response.ok) {
-    // Arată mai multe informații despre răspunsul eșuat
-    const errorData = await response.json();
-
-    console.error("Error fetching car:", errorData);
-    throw new Error("Failed to fetch car");
-  }
-
-  const data = await response.json();
-
-  return data;
-};
-
-export const createCar = async (
-  car: Omit<Car, "id">,
-  token: string
-): Promise<Car> => {
-  const response = await fetch("http://localhost:3000/cars", {
-    body: JSON.stringify(car),
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to create car");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
-export const deleteCar = async (id: number, token: string): Promise<void> => {
-  const response = await fetch(`http://localhost:3000/cars/${id}`, {
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
+export const deleteCar = async (id: number, token: string) => {
+  const response = await fetch(`${BASE_URL}/cars/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
     throw new Error("Failed to delete car");
   }
+
+  return response.json();
+};
+
+export const updateCar = async (id: number, car: ICars, token: string) => {
+  const response = await fetch(`${BASE_URL}/cars/${id}`, {
+    body: JSON.stringify(car),
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update car");
+  }
+
+  return response.json();
+};
+
+export const addCar = async (car: ICars, token: string) => {
+  const response = await fetch(`${BASE_URL}/cars`, {
+    body: JSON.stringify(car),
+    headers: {
+      Authorization: `${token}`,
+      "Content-type": "application/json; charset=UTF-8",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to add new car");
+  }
+
+  return response.json();
+};
+
+export const getDetailsByParams = async (brand: string, model: string) => {
+  const query = new URLSearchParams();
+
+  if (brand) query.append("brand", brand);
+  if (model) query.append("model", model);
+
+  const response = await fetch(`${BASE_URL}/cars?${query.toString()}`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  return response.json();
 };

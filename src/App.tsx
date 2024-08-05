@@ -1,26 +1,18 @@
-import {
-  Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import { Logout } from "./pages/Logout";
-import { Login } from "./pages/Login";
-import { CreateCar } from "./pages/CreateCar";
 import { CarTable } from "./pages/CarTable";
-import { CarDetails } from "./pages/CarDetails";
-import { EditCar } from "./pages/EditCar";
-import { Navbar } from "./components/nav";
+import { CarDetail } from "./pages/CarDetail";
+import { AddCar } from "./pages/AddCar";
+import { Login } from "./pages/Login";
+import { Logout } from "./pages/Logout";
 
-export function App() {
+export const App = () => {
   const [token, setToken] = useState<null | string>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
-
     if (savedToken) {
       setToken(savedToken);
       setIsAuthenticated(true);
@@ -39,23 +31,55 @@ export function App() {
     setIsAuthenticated(false);
   };
 
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
-
   return (
-    <Router>
-      <div className="App">
-        <Navbar />
+    <div className="container">
+      <BrowserRouter>
         <Routes>
-          <Route path="/" element={<CarTable token={token} />} />
-          <Route path="/car/:id" element={<CarDetails token={token} />} />
-          <Route path="/create-car" element={<CreateCar token={token} />} />
-          <Route path="/edit-car/:id" element={<EditCar token={token} />} />
-          <Route path="/logout" element={<Logout onLogout={handleLogout} />} />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/" />
+              ) : (
+                <Login onLogin={handleLogin} />
+              )
+            }
+          />
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <>
+                  <Logout onLogout={handleLogout} token={token!} />
+                  <CarTable token={token!} />
+                </>
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/newcar"
+            element={
+              isAuthenticated ? (
+                <AddCar token={token!} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/:carId"
+            element={
+              isAuthenticated ? (
+                <CarDetail token={token!} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
         </Routes>
-      </div>
-    </Router>
+      </BrowserRouter>
+    </div>
   );
-}
+};
