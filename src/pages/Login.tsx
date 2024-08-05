@@ -1,32 +1,29 @@
-// src/pages/Login.tsx
-import React, { FormEvent, useState } from 'react'
-
-import { loginUser } from '../api/cars-api'
+import React, { FormEvent, useState } from "react";
+import { loginUser } from "../api/cars-api";
 
 interface LoginProps {
-  onLogin: (token: string) => void
+  onLogin: (token: string) => void;
 }
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [message, setMessage] = useState('')
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const data = await loginUser(username, password)
-
-      if (data.user) {
-        setMessage('Login successful!')
-        onLogin(data.user.token)
+      const data = await loginUser(username, password);
+      if (data.user && data.user.token) {
+        setMessage("Login successful!");
+        onLogin(data.user.token);
       } else {
-        setMessage('Invalid credentials')
+        setMessage("Invalid credentials");
       }
     } catch (error) {
-      setMessage('An error occurred. Please try again.')
+      setMessage("An error occurred. Please try again.");
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-200">
@@ -41,6 +38,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 onChange={(e) => setUsername(e.target.value)}
                 type="text"
                 value={username}
+                required
               />
             </label>
           </div>
@@ -52,6 +50,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 value={password}
+                required
               />
             </label>
           </div>
@@ -65,5 +64,5 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         {message && <p className="mt-4 text-center text-red-500">{message}</p>}
       </div>
     </div>
-  )
-}
+  );
+};
