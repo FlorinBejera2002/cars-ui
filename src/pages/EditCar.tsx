@@ -1,4 +1,3 @@
-// src/pages/EditCar.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Label, TextInput, Spinner, Alert } from 'flowbite-react';
@@ -17,20 +16,21 @@ export const EditCar: React.FC<EditCarProps> = ({ token }) => {
   const [formData, setFormData] = useState<Partial<Car>>({});
 
   useEffect(() => {
+    if (!token) {
+      setError("No token provided");
+      setLoading(false);
+      return;
+    }
+
     const fetchCar = async () => {
-      if (token) {
-        try {
-          const carData = await getCarById(parseInt(id, 10), token);
-          setCar(carData);
-          setFormData(carData);
-          setLoading(false);
-        } catch (error) {
-          console.error("Failed to fetch car:", error);
-          setError("Failed to fetch car data");
-          setLoading(false);
-        }
-      } else {
-        setError("No token provided");
+      try {
+        const carData = await getCarById(token);
+        setCar(carData);
+        setFormData(carData);
+      } catch (error) {
+        console.error("Failed to fetch car:", error);
+        setError("Failed to fetch car data");
+      } finally {
         setLoading(false);
       }
     };

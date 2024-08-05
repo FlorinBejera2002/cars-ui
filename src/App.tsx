@@ -48,6 +48,15 @@ export function App() {
       <div className="App">
         <Navbar />
         <Routes>
+        <Route
+            path="/"
+            element={!isAuthenticated ? <Login onLogin={handleLogin} /> : (
+              <>
+                <Logout onLogout={handleLogout} />
+                <CarTable token={token} />
+              </>
+            )}
+          />
           <Route path="/" element={<CarTable token={token} />} />
           <Route path="/car/:id" element={<CarDetails token={token} />} />
           <Route path="/create-car" element={<CreateCar token={token} />} />
