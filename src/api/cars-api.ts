@@ -22,25 +22,30 @@ export const loginUser = async (
   username: string,
   password: string
 ): Promise<LoginResponse> => {
-  const response = await fetch(`${BASE_URL}/login`, {
-    body: JSON.stringify({ password, username }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-  });
+  try {
+    const response = await fetch(`${BASE_URL}/login`, {
+      body: JSON.stringify({ password, username }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to login");
+    if (!response.ok) {
+      throw new Error(`Failed to login: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data as LoginResponse;
+  } catch (error) {
+    console.error("Error logging in:", error);
+    throw error; 
   }
-  const data = await response.json();
-  return data;
 };
-
 export const logoutUser = async (token: string): Promise<LogoutResponse> => {
   const response = await fetch(`${BASE_URL}/logout`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `${token}`,
       "Content-Type": "application/json",
     },
     method: "POST",
@@ -53,12 +58,10 @@ export const logoutUser = async (token: string): Promise<LogoutResponse> => {
   return data;
 };
 
-// For other API calls, ensure the token is included in the headers as shown in the examples below
-
 export const getAllCars = async (token: string): Promise<ICars[]> => {
   const response = await fetch(`${BASE_URL}/cars`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `${token}`,
       "Content-Type": "application/json",
     },
     method: "GET",
@@ -88,20 +91,18 @@ export const deleteCar = async (id: number, token: string) => {
 };
 
 export const updateCar = async (id: number, car: ICars, token: string) => {
-  const response = await fetch(`${BASE_URL}/cars/${id}`, {
+   await fetch(`${BASE_URL}/cars/${id}`, {
     body: JSON.stringify(car),
     headers: {
       Authorization: `${token}`,
       "Content-Type": "application/json",
     },
     method: "PUT",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update car");
-  }
-
-  return response.json();
+  })
+  .then((response) => response.json())
+    .then((response) => console.log(response))
+    .catch((error) => console.error('Failed to update car:', error))
+  location.reload()
 };
 
 export const addCar = async (car: ICars, token: string) => {

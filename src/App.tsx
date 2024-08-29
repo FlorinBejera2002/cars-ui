@@ -1,23 +1,15 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { CarTable } from "./pages/CarTable";
 import { CarDetail } from "./pages/CarDetail";
 import { AddCar } from "./pages/AddCar";
 import { Login } from "./pages/Login";
-import { Logout } from "./pages/Logout";
+import { Navbar } from "./components/Navbar";
 
 export const App = () => {
   const [token, setToken] = useState<null | string>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (savedToken) {
-      setToken(savedToken);
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   const handleLogin = (token: string) => {
     localStorage.setItem("token", token);
@@ -32,8 +24,9 @@ export const App = () => {
   };
 
   return (
-    <div className="container">
+    <div className="h-full">
       <BrowserRouter>
+        {isAuthenticated && <Navbar onLogout={handleLogout} />}
         <Routes>
           <Route
             path="/login"
@@ -49,10 +42,7 @@ export const App = () => {
             path="/"
             element={
               isAuthenticated ? (
-                <>
-                  <Logout onLogout={handleLogout} token={token!} />
-                  <CarTable token={token!} />
-                </>
+                <CarTable token={token!} />
               ) : (
                 <Navigate to="/login" />
               )

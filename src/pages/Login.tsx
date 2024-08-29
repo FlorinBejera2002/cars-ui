@@ -12,6 +12,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setMessage(""); // Resetează mesajul la fiecare submit
     try {
       const data = await loginUser(username, password);
       if (data.user && data.user.token) {
@@ -31,9 +32,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700">
+            <label className="block text-gray-700" htmlFor="username">
               Username
               <input
+                id="username"
                 className="w-full px-3 py-2 mt-1 border rounded"
                 onChange={(e) => setUsername(e.target.value)}
                 type="text"
@@ -43,9 +45,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </label>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">
+            <label className="block text-gray-700" htmlFor="password">
               Password
               <input
+                id="password"
                 className="w-full px-3 py-2 mt-1 border rounded"
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"

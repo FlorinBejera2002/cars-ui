@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import React from "react";
 import { getAllCars, deleteCar, updateCar } from "../api/cars-api";
 import { ICars } from "../types";
 import { FormInput } from "../components/FormInput";
+
 import {
   Alert,
   Spinner,
@@ -25,6 +26,8 @@ export const CarTable = ({ token }: { token: string }) => {
   const [deleteCarId, setDeleteCarId] = useState<null | number>(null);
   const [selectedCars, setSelectedCars] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -55,10 +58,17 @@ export const CarTable = ({ token }: { token: string }) => {
 
   const handleSave = async (id: number, updatedCar: ICars) => {
     try {
-      await updateCar(id, updatedCar, token);
-      setEditCarId(null);
+      const response = await updateCar(id, updatedCar, token);
+      if (response) {
+        setSuccessMessage("Car updated successfully!");
+        setErrorMessage(null); // Reset error message
+        setEditCarId(null);
+        window.location.reload();
+      }
     } catch (error) {
-      console.error("There was a problem updating the car:", error);
+      setEditCarId(null)
+      setErrorMessage("Failed to update car. Please try again.");
+      setSuccessMessage(null); // Reset success message
     }
   };
 
@@ -97,53 +107,46 @@ export const CarTable = ({ token }: { token: string }) => {
   if (error) return <Alert color="failure">{error}</Alert>;
 
   return (
-    <div className="flex flex-col items-center mt-20">
-      <div className="flex gap-20 mb-10">
-        <TextInput
-          onChange={(e) => setFilterName(e.target.value)}
-          placeholder="Filter by name"
-          type="name"
-          value={filterName}
-        />
-      </div>
-
-      <div className="overflow-x-auto">
-        <Table className="min-w-full bg-white shadow-lg rounded-lg">
-          <Table.Head>
-            <Table.HeadCell>
+    <div className="flex flex-col items-center bg-gradient-to-t from-white to-slate-300">
+      <div className="w-full max-w-6xl">
+        <div className="flex mb-5 mt-4 justify-between">
+          <div className="flex items-center gap-3">
+            <Link to={"/newCar"} className="bg-white text-gray-700 py-2 px-10 rounded-md font-bold text-serif">Add new car</Link>
+          </div>
+          <TextInput
+            onChange={(e) => setFilterName(e.target.value)}
+            placeholder="Search..."
+            type="name"
+            value={filterName}
+          />
+        </div>
+        <Table className="shadow-lg rounded-lg w-full" hoverable={true}>
+          <Table.Head className="h-12">
+            <Table.HeadCell className="text-left">
               <Checkbox checked={selectAll} onChange={handleSelectAll} />
             </Table.HeadCell>
-            <Table.HeadCell>Id</Table.HeadCell>
-            <Table.HeadCell>Brand</Table.HeadCell>
-            <Table.HeadCell>Model</Table.HeadCell>
-            <Table.HeadCell></Table.HeadCell>
-            <Table.HeadCell>
+            <Table.HeadCell className="text-left">Id</Table.HeadCell>
+            <Table.HeadCell className="text-left">Emblem</Table.HeadCell>
+            <Table.HeadCell className="text-left">Brand</Table.HeadCell>
+            <Table.HeadCell className="text-left">Model</Table.HeadCell>
+            <Table.HeadCell className="text-left">Color</Table.HeadCell>
+            <Table.HeadCell className="text-left">Horse Power</Table.HeadCell>
+            <Table.HeadCell className="text-right">
               {selectedCars.length > 0 && (
                 <button
-                  className="text-red-700 font-bold text-sm"
+                  className="text-red-700 font-bold text-sm z-10"
                   onClick={handleDeleteSelected}
                 >
                   Delete
                 </button>
               )}
             </Table.HeadCell>
-            <Table.HeadCell>
-              <span className="sr-only">Edit</span>
-            </Table.HeadCell>
-            <Table.HeadCell>
-              <span className="sr-only">Delete</span>
-            </Table.HeadCell>
           </Table.Head>
-          <Table.Body className="divide-y">
+          <Table.Body className="divide-y w-full">
             {filteredCars.map((car) => (
               <React.Fragment key={car.id}>
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800 relative">
-                  <Table.Cell
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelectCar(car.id);
-                    }}
-                  >
+                <Table.Row className="bg-white relative w-full">
+                  <Table.Cell className="text-left">
                     <Checkbox
                       checked={selectedCars.includes(car.id)}
                       className="z-20 cursor-pointer"
@@ -153,18 +156,45 @@ export const CarTable = ({ token }: { token: string }) => {
                       }}
                     />
                   </Table.Cell>
-                  <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                  <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white" onClick={() => showCarDetails(car.id)}>
                     {car.id}
                   </Table.Cell>
-                  <Table.Cell onClick={() => showCarDetails(car.id)}>
+                  <Table.Cell className="text-left" onClick={() => showCarDetails(car.id)}>
+                    <img
+                      src={`../../public/${car.brand.toLocaleLowerCase()}.png`}
+                      alt={`${car.brand} logo`}
+                      className="h-5 w-auto"
+                    />
+                  </Table.Cell>
+                  <Table.Cell
+                    className="text-left"
+                    onClick={() => showCarDetails(car.id)}
+                  >
                     {car.brand}
                   </Table.Cell>
-                  <Table.Cell onClick={() => showCarDetails(car.id)}>
+
+                  <Table.Cell
+                    className="text-left"
+                    onClick={() => showCarDetails(car.id)}
+                  >
                     {car.model}
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell
+                    className="text-left"
+                    onClick={() => showCarDetails(car.id)}
+                  >
+                    {car.color}
+                  </Table.Cell>
+                  <Table.Cell
+                    className="text-left"
+                    onClick={() => showCarDetails(car.id)}
+                  >
+                    {car.horsePower}
+                  </Table.Cell>
+
+                  <Table.Cell className="text-right">
                     <button
-                      className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 z-10"
+                      className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 z-10 pr-10"
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditCarId(car.id);
@@ -172,10 +202,8 @@ export const CarTable = ({ token }: { token: string }) => {
                     >
                       Edit
                     </button>
-                  </Table.Cell>
-                  <Table.Cell>
                     <button
-                      className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 z-10"
+                      className="font-bold text-red-700 hover:underline z-10"
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeleteCarId(car.id);
@@ -185,9 +213,29 @@ export const CarTable = ({ token }: { token: string }) => {
                     </button>
                   </Table.Cell>
                 </Table.Row>
+
+                {successMessage && (
+                  <Alert
+                    color="success"
+                    className="fixed bottom-4 right-4 z-50"
+                    onDismiss={() => setSuccessMessage(null)}
+                  >
+                    {successMessage}
+                  </Alert>
+                )}
+                {errorMessage && (
+                  <Alert
+                    color="failure"
+                    className="fixed bottom-4 right-4 z-50"
+                    onDismiss={() => setErrorMessage(null)}
+                  >
+                    {errorMessage}
+                  </Alert>
+                )}
+
                 <Modal
                   onClose={() => setEditCarId(null)}
-                  show={editCarId === car.id}
+                  show={editCarId !== null}
                   size="lg"
                 >
                   <Modal.Header>Edit Car</Modal.Header>
@@ -195,13 +243,14 @@ export const CarTable = ({ token }: { token: string }) => {
                     <FormInput
                       buttonColor="success"
                       functionEvent={(updatedCar) =>
-                        handleSave(car.id, updatedCar)
+                        handleSave(editCarId!, updatedCar)
                       }
                       textButton="Save"
                       valueState={car}
                     />
                   </Modal.Body>
                 </Modal>
+
                 <Modal
                   onClose={() => setDeleteCarId(null)}
                   popup={true}

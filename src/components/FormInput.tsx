@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ICars } from "../types";
-import { Button, Label, TextInput } from "flowbite-react";
+import { Button, Label, TextInput, Card } from "flowbite-react";
 
 type IProps = {
   buttonColor?: string;
@@ -33,61 +33,71 @@ export const FormInput = ({
   };
 
   return (
-    <div className="space-y-6 w-96">
-      <div>
-        <div className="mb-2 block">
-          <Label htmlFor="brand" value="Brand" />
+    <div className="flex justify-center items-center">
+      <Card className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg space-y-6">
+        <h2 className="text-2xl font-bold text-center text-gray-800">
+          Add New Car
+        </h2>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="brand" value="Brand" className="text-gray-700" />
+            <TextInput
+              id="brand"
+              onChange={(e) => setBrand(e.target.value)}
+              value={brand}
+              placeholder="Enter car brand"
+              className="mt-2"
+            />
+          </div>
+          <div>
+            <Label htmlFor="model" value="Model" className="text-gray-700" />
+            <TextInput
+              id="model"
+              onChange={(e) => setModel(e.target.value)}
+              value={model}
+              placeholder="Enter car model"
+              className="mt-2"
+            />
+          </div>
+          <div>
+            <Label htmlFor="color" value="Color" className="text-gray-700" />
+            <TextInput
+              id="color"
+              onChange={(e) => setColor(e.target.value)}
+              value={color}
+              placeholder="Enter car color"
+              className="mt-2"
+            />
+          </div>
+          <div>
+            <Label htmlFor="engine" value="Engine" className="text-gray-700" />
+            <TextInput
+              id="engine"
+              onChange={(e) => setEngine(e.target.value)}
+              value={engine}
+              placeholder="Enter engine details"
+              className="mt-2"
+            />
+          </div>
+          <div>
+            <Label
+              htmlFor="horsePower"
+              value="Horse Power"
+              className="text-gray-700"
+            />
+            <TextInput
+              id="horsePower"
+              type="number"
+              onChange={(e) => setHorsePower(Number(e.target.value))}
+              value={horsePower}
+              className="mt-2"
+            />
+          </div>
         </div>
-        <TextInput
-          id="brand"
-          onChange={(e) => setBrand(e.target.value)}
-          value={brand}
-        />
-      </div>
-      <div>
-        <div className="mb-2 block">
-          <Label htmlFor="model" value="Model" />
-        </div>
-        <TextInput
-          id="model"
-          onChange={(e) => setModel(e.target.value)}
-          value={model}
-        />
-      </div>
-      <div>
-        <div className="mb-2 block">
-          <Label htmlFor="color" value="Color" />
-        </div>
-        <TextInput
-          id="color"
-          onChange={(e) => setColor(e.target.value)}
-          value={color}
-        />
-      </div>
-      <div>
-        <div className="mb-2 block">
-          <Label htmlFor="engine" value="Engine" />
-        </div>
-        <TextInput
-          id="engine"
-          onChange={(e) => setEngine(e.target.value)}
-          value={engine}
-        />
-      </div>
-      <div>
-        <div className="mb-2 block">
-          <Label htmlFor="horsePower" value="Horse Power" />
-        </div>
-        <TextInput
-          id="horsePower"
-          type="number"
-          onChange={(e) => setHorsePower(Number(e.target.value))}
-          value={horsePower}
-        />
-      </div>
-      <Button color={buttonColor} onClick={handleSubmit}>
-        {textButton}
-      </Button>
+        <Button color={buttonColor} onClick={handleSubmit} className="w-full">
+          {textButton}
+        </Button>
+      </Card>
     </div>
   );
 };
