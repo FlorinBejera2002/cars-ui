@@ -1,4 +1,5 @@
-import React, { FormEvent, useState } from "react";
+import type React from "react";
+import { type FormEvent, useState } from "react";
 import { loginUser } from "../api/cars-api";
 
 interface LoginProps {
@@ -15,7 +16,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setMessage(""); // Resetează mesajul la fiecare submit
     try {
       const data = await loginUser(username, password);
-      if (data.user && data.user.token) {
+      if (data.user?.token) {
         setMessage("Login successful!");
         onLogin(data.user.token);
       } else {
@@ -34,28 +35,28 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <div className="mb-4">
             <label className="block text-gray-700" htmlFor="username">
               Username
-              <input
-                id="username"
-                className="w-full px-3 py-2 mt-1 border rounded"
-                onChange={(e) => setUsername(e.target.value)}
-                type="text"
-                value={username}
-                required
-              />
             </label>
+            <input
+              id="username"
+              className="w-full px-3 py-2 mt-1 border rounded"
+              onChange={(e) => setUsername(e.target.value)}
+              type="text"
+              value={username}
+              required
+            />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700" htmlFor="password">
               Password
-              <input
-                id="password"
-                className="w-full px-3 py-2 mt-1 border rounded"
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                value={password}
-                required
-              />
             </label>
+            <input
+              id="password"
+              className="w-full px-3 py-2 mt-1 border rounded"
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              value={password}
+              required
+            />
           </div>
           <button
             className="w-full px-3 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"

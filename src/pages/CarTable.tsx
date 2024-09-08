@@ -63,10 +63,14 @@ export const CarTable = ({ token }: { token: string }) => {
         setSuccessMessage("Car updated successfully!");
         setErrorMessage(null); // Reset error message
         setEditCarId(null);
-        window.location.reload();
+
+        // Actualizează starea cu mașina editată
+        setCars((prevCars) =>
+          prevCars.map((car) => (car.id === id ? response : car))
+        );
       }
     } catch (error) {
-      setEditCarId(null)
+      setEditCarId(null);
       setErrorMessage("Failed to update car. Please try again.");
       setSuccessMessage(null); // Reset success message
     }
@@ -235,7 +239,7 @@ export const CarTable = ({ token }: { token: string }) => {
 
                 <Modal
                   onClose={() => setEditCarId(null)}
-                  show={editCarId !== null}
+                  show={editCarId === car.id}
                   size="lg"
                 >
                   <Modal.Header>Edit Car</Modal.Header>
@@ -243,14 +247,13 @@ export const CarTable = ({ token }: { token: string }) => {
                     <FormInput
                       buttonColor="success"
                       functionEvent={(updatedCar) =>
-                        handleSave(editCarId!, updatedCar)
+                        handleSave(editCarId, updatedCar)
                       }
                       textButton="Save"
                       valueState={car}
                     />
                   </Modal.Body>
                 </Modal>
-
                 <Modal
                   onClose={() => setDeleteCarId(null)}
                   popup={true}

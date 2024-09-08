@@ -1,7 +1,6 @@
 const BASE_URL = "http://localhost:3000";
 
-import { ICars } from "../types";
-
+import type { ICars } from "../types";
 export interface User {
   id: number;
   password: string;
@@ -91,18 +90,24 @@ export const deleteCar = async (id: number, token: string) => {
 };
 
 export const updateCar = async (id: number, car: ICars, token: string) => {
-   await fetch(`${BASE_URL}/cars/${id}`, {
-    body: JSON.stringify(car),
+  const { id: carId, ...carWithoutId } = car; // Extragere și eliminare id
+
+  const response = await fetch(`${BASE_URL}/cars/${id}`, {
+    body: JSON.stringify(carWithoutId),
     headers: {
       Authorization: `${token}`,
       "Content-Type": "application/json",
     },
     method: "PUT",
-  })
-  .then((response) => response.json())
-    .then((response) => console.log(response))
-    .catch((error) => console.error('Failed to update car:', error))
-  location.reload()
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Failed to update car:", errorText);
+    throw new Error("Failed to update car");
+  }
+
+  return response.json();
 };
 
 export const addCar = async (car: ICars, token: string) => {
